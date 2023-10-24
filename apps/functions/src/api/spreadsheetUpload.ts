@@ -1,13 +1,11 @@
 import { init } from '../helpers/init'
-import { ILiveTableRow } from '../interfaces/live'
-import { TDiamondContentTableRaw } from '../interfaces/xlsFile'
 import * as dayjs from 'dayjs'
 import * as duration from 'dayjs/plugin/duration'
 import { getFirestore } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
 import { IncomingForm } from 'formidable-serverless'
 import { cluster, map, objectify } from 'radash'
-import readXlsxFile from 'read-excel-file/node'
+import * as readXlsxFile from 'read-excel-file/node'
 
 init()
 
@@ -27,7 +25,8 @@ export const spreadsheetUpload = functions.https.onRequest(async (req, res) => {
 
         const file = files.file
 
-        const fileContent = (await readXlsxFile(file.path)) as TDiamondContentTableRaw[]
+        //@ts-expect-error
+        const fileContent = (await readXlsxFile(file.path)) as []
         fileContent.splice(0, 1) // ignore first row
 
         if (fileContent.some((row) => row[3] > 1)) throw new Error('A planilha deve ser apenas de 1 dia')
@@ -56,11 +55,11 @@ export const spreadsheetUpload = functions.https.onRequest(async (req, res) => {
 
         await batch.commit()
 
-        res.send(' lives added')
+        res.send('lives added')
     })
 })
 
-async function findUserFromTable(table: Omit<ILiveTableRow, 'uid'>[]) {
+async function findUserFromTable(table: Omit<Record<string, any>, 'uid'>[]) {
     const usernamesCluster = cluster(
         table.map((row) => row.username),
         30
@@ -73,7 +72,7 @@ async function findUserFromTable(table: Omit<ILiveTableRow, 'uid'>[]) {
         userCollection.where('username', 'in', usernames).get()
     )
 
-    const users: Record<string, any>[] = usersSnapshot
+    const users: Record<string, string>[] = usersSnapshot
         .map((snap) => snap.docs)
         .flat()
         .map((user) => ({ uid: user.id, ...user.data() }))
@@ -87,7 +86,7 @@ async function findUserFromTable(table: Omit<ILiveTableRow, 'uid'>[]) {
     return usersMap
 }
 
-function parseRow(data: TDiamondContentTableRaw): Omit<ILiveTableRow, 'uid'> {
+function parseRow(data: any[]): Omit<Record<string, any>, 'uid'> {
     const [username, displayName] = data[0].split('\n\n')
     const diamonds = Number(data[1].toString().replace('.', ''))
     const duration = parseDuration(data[2])

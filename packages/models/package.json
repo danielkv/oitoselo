@@ -1,0 +1,13 @@
+{
+	"name": "oitoselo-models",
+	"version": "1.0.0",
+	"main": "index.ts",
+	"types": "index.ts",
+	"packageManager": "yarn@3.6.4",
+	"scripts": {
+		"barrels": "barrelsby --delete -e .spec -e \".\\.d\\.ts\" -H "
+	},
+	"dependencies": {
+		"barrelsby": "^2.8.1"
+	}
+}
