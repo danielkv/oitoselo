@@ -3,10 +3,12 @@ export interface IUserInput {
     email: string
     username: string
     password: string
+    photoURL?: string
+    phoneNumber?: string
 }
 
 export interface IUser extends Omit<IUserInput, 'password'> {
-    uid: string
-    photoURL: string
-    phoneNumber: string
+    id: string
+    photoURL?: string
+    phoneNumber?: string
 }

@@ -5,11 +5,11 @@
 	"types": "index.ts",
 	"packageManager": "yarn@3.6.4",
 	"scripts": {
-		"barrels": "barrelsby --delete -e .spec -e \".\\.d\\.ts\" -H "
+		"barrels": "barrelsby --delete -e .spec -e \".\\.d\\.ts\" -H ",
+		"firebase": "^10.5.0"
 	},
 	"dependencies": {
 		"barrelsby": "^2.8.1",
-		"firebase-admin": "^11.11.0",
 		"oitoselo-models": "*",
 		"radash": "^11.0.0"
 	}
