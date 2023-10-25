@@ -75,12 +75,12 @@ async function findUserFromTable(table: Omit<Record<string, any>, 'uid'>[]) {
     const users: Record<string, string>[] = usersSnapshot
         .map((snap) => snap.docs)
         .flat()
-        .map((user) => ({ uid: user.id, ...user.data() }))
+        .map((user) => ({ id: user.id, ...user.data() }))
 
     const usersMap = objectify(
         users,
         (f) => f.username,
-        (f) => f.uid
+        (f) => f.id
     )
 
     return usersMap

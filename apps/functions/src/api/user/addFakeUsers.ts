@@ -1,6 +1,8 @@
 import { init } from '../../helpers/init'
+import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
+import { map } from 'radash'
 
 init()
 
@@ -362,13 +364,15 @@ export const addFakeUsers = functions.https.onRequest(async (req, res) => {
     }
 
     const db = getFirestore()
+    const auth = getAuth()
 
     const batch = db.batch()
 
-    fakeUsers.forEach((user) => {
-        const newDoc = db.collection('users').doc()
+    await map(fakeUsers, async (user) => {
+        const newAuthUser = await auth.createUser({ displayName: user.name })
 
-        batch.create(newDoc, user)
+        const newDoc = db.collection('users').doc(newAuthUser.uid)
+        batch.create(newDoc, { displayName: user.name, username: user.username })
     })
 
     await batch.commit()

@@ -8,17 +8,19 @@ init()
 
 export const updateUser = https.onCall(
     async ({ uid, data }: { uid: string; data: Partial<Record<string, any>> }, context) => {
-        const fs = getFirestore()
-
         try {
             if (!context.auth?.token.admin && uid !== context.auth?.uid)
                 throw new Error('User does not have permission')
 
-            const normalizedData = pick(data, ['displayName', 'email', 'photoURL', 'phoneNumber', 'username'])
+            // UPDATE AUTH USER
             const auth = getAuth()
+            const normalizedData = pick(data, ['displayName', 'email', 'photoURL', 'phoneNumber'])
             await auth.updateUser(uid, normalizedData)
 
-            await fs.collection('user_data').doc(uid).update(normalizedData)
+            // UPDATE DB USER
+            const db = getFirestore()
+            const normalizedDbData = pick(data, ['displayName', 'email', 'photoURL', 'phoneNumber', 'username'])
+            await db.collection('users').doc(uid).update(normalizedDbData)
         } catch (err: any) {
             throw new https.HttpsError('unknown', err.code, { message: err.message, code: err.code })
         }
