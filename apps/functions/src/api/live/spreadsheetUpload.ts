@@ -1,4 +1,4 @@
-import { init } from '../helpers/init'
+import { init } from '../../helpers/init'
 import * as dayjs from 'dayjs'
 import * as duration from 'dayjs/plugin/duration'
 import { getFirestore } from 'firebase-admin/firestore'

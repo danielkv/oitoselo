@@ -4987,7 +4987,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"oitoselo-utils@workspace:packages/utils":
+"oitoselo-utils@*, oitoselo-utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "oitoselo-utils@workspace:packages/utils"
   dependencies:
@@ -5012,9 +5012,11 @@ __metadata:
     autoprefixer: ^10.4.16
     firebase: ^10.5.0
     oitoselo-models: "*"
+    oitoselo-utils: "*"
     postcss: ^8.4.31
     postcss-import: ^15.1.0
     prettier: ^3.0.3
+    radash: ^11.0.0
     react: ^18.2.0
     react-dom: ^18.2.0
     react-router-dom: ^6.17.0

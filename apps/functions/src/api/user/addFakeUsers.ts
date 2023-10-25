@@ -1,4 +1,4 @@
-import { init } from '../helpers/init'
+import { init } from '../../helpers/init'
 import { getFirestore } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
 
