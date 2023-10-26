@@ -1,5 +1,6 @@
 import { LockOutlined, MailOutlined, PhoneOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
+import { useAuthenticatedRedirect } from '@hooks/auth/useAuthenticatedRedirect'
 import { createUserUseCase } from '@useCases/user/createUser'
 import { Button, Card, Flex, Form, Input, Layout, Modal } from 'antd'
 import { IUserInput } from 'oitoselo-models'
@@ -14,6 +15,8 @@ interface ISubscriptionForm extends IUserInput {
 const Subscription: React.FC = () => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
+
+    useAuthenticatedRedirect()
 
     const handleSubmit = async (values: ISubscriptionForm) => {
         setLoading(true)

@@ -6,7 +6,7 @@ interface IAppAuthContext {
     setAuthetication(user: IAutheticationContext | null): void
 }
 
-export const useAthenticationContext = create<IAppAuthContext>((set) => ({
+export const useAuthenticationContext = create<IAppAuthContext>((set) => ({
     authetication: null,
     setAuthetication(authetication) {
         set({ authetication })

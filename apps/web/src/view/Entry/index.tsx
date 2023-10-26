@@ -1,7 +1,7 @@
 import { router } from '../../router'
+import { useConfig } from '@hooks/auth/useConfig'
 import { ConfigProvider } from 'antd'
 import { RouterProvider } from 'react-router-dom'
-import { useConfig } from 'src/domain/hooks/app/useConfig'
 
 const Entry: React.FC = () => {
     useConfig()

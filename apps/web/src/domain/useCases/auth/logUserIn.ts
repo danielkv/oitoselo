@@ -1,10 +1,10 @@
 import { getAuthenticationContextUseCase } from './getAuthenticationContext'
 import { firebaseProvider } from '@common/providers/firebase'
-import { useAthenticationContext } from '@contexts/auth/user'
+import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { IUser } from 'oitoselo-models'
 
-const setAuthentication = useAthenticationContext.getState().setAuthetication
+const setAuthentication = useAuthenticationContext.getState().setAuthetication
 
 export async function logUserInUseCase(email: string, password: string): Promise<IUser> {
     const auth = firebaseProvider.getAuth()

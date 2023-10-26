@@ -1,12 +1,12 @@
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { firebaseProvider } from '@common/providers/firebase'
-import { useAthenticationContext } from '@contexts/auth/user'
+import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
 import { getAuthenticationContextUseCase } from '@useCases/auth/getAuthenticationContext'
 import { Modal } from 'antd'
 import { User } from 'firebase/auth'
 import { useEffect } from 'react'
 
-const setAuthetication = useAthenticationContext.getState().setAuthetication
+const setAuthetication = useAuthenticationContext.getState().setAuthetication
 const { error } = Modal
 
 export function useConfig() {

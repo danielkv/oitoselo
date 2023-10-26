@@ -30,6 +30,7 @@
             "@common/*": ["src/common/*"],
             "@useCases/*": ["src/domain/useCases/*"],
             "@contexts/*": ["src/domain/contexts/*"],
+            "@hooks/*": ["src/domain/hooks/*"],
             "@assets/*": ["src/assets/*"],
             "@view/*": ["src/view/*"]
         }

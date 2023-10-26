@@ -1,9 +1,10 @@
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
+import { useAuthenticatedRedirect } from '@hooks/auth/useAuthenticatedRedirect'
 import { logUserInUseCase } from '@useCases/auth/logUserIn'
 import { Button, Card, Flex, Form, Input, Layout, Modal } from 'antd'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface ILoginForm {
     email: string
@@ -12,12 +13,19 @@ interface ILoginForm {
 
 const Login: React.FC = () => {
     const navigate = useNavigate()
+    const location = useLocation()
+    const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search])
+    const redirectTo = queryParams.get('redirect')
+
+    useAuthenticatedRedirect()
+
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (values: ILoginForm) => {
         setLoading(true)
         try {
             await logUserInUseCase(values.email, values.password)
+            navigate(redirectTo || '/')
         } catch (err) {
             Modal.error({ title: 'Ocorreu um erro', content: getErrorMessage(err) })
         } finally {
