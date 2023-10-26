@@ -1,11 +1,10 @@
 import './index.scss'
-import { router } from './router/index.tsx'
+import Entry from '@view/Entry/index.tsx'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <Entry />
     </React.StrictMode>
 )
