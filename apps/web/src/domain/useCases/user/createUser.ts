@@ -6,14 +6,21 @@ import { omit, pick } from 'radash'
 
 const db = firebaseProvider.firestore()
 
-export async function createUserUseCase(data: IUserInput): Promise<IUser> {
+export async function createUserUseCase(data: Omit<IUserInput, 'claims'>): Promise<IUser> {
     const userCredentials = await createUserWithEmailAndPassword(firebaseProvider.getAuth(), data.email, data.password)
     const dataToSaveInAuth = pick(data, ['displayName', 'photoURL'])
     await updateProfile(userCredentials.user, dataToSaveInAuth)
 
     const dataToSaveInDb = omit(data, ['password'])
     const docRef = db.doc('users', userCredentials.user.uid).withConverter(userConverter)
-    await db.setDoc(docRef, dataToSaveInDb)
+    await db.setDoc(docRef, {
+        ...dataToSaveInDb,
+        disabled: false,
+        claims: {
+            admin: false,
+            userConfirmed: false,
+        },
+    } as IUser)
 
     return {
         id: userCredentials.user.uid,
@@ -22,5 +29,10 @@ export async function createUserUseCase(data: IUserInput): Promise<IUser> {
         email: data.email,
         phoneNumber: userCredentials.user.phoneNumber || '',
         photoURL: userCredentials.user.phoneNumber || '',
+        disabled: false,
+        claims: {
+            admin: false,
+            userConfirmed: false,
+        },
     }
 }

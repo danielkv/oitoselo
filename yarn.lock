@@ -2580,6 +2580,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"client-only@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "client-only@npm:0.0.1"
+  checksum: 0c16bf660dadb90610553c1d8946a7fdfb81d624adea073b8440b7d795d5b5b08beb3c950c6a2cf16279365a3265158a236876d92bce16423c485c322d7dfaf8
+  languageName: node
+  linkType: hard
+
 "cliui@npm:^8.0.1":
   version: 8.0.1
   resolution: "cliui@npm:8.0.1"
@@ -5030,6 +5037,7 @@ __metadata:
     react-dom: ^18.2.0
     react-router-dom: ^6.17.0
     sass: ^1.69.4
+    swr: ^2.2.4
     tailwindcss: ^3.3.5
     typescript: ^5.0.2
     vite: ^4.4.5
@@ -6686,6 +6694,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"swr@npm:^2.2.4":
+  version: 2.2.4
+  resolution: "swr@npm:2.2.4"
+  dependencies:
+    client-only: ^0.0.1
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    react: ^16.11.0 || ^17.0.0 || ^18.0.0
+  checksum: d1398f89fd68af0e0cb6100a5769b1e17c0dbe8a778898643ad28456acda64add43344754c7d919e3f2ca82854adf86ff7d465aba25a2d555bcb669e457138f8
+  languageName: node
+  linkType: hard
+
 "tailwindcss@npm:^3.3.5":
   version: 3.3.5
   resolution: "tailwindcss@npm:3.3.5"
@@ -7028,7 +7048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:1.2.0":
+"use-sync-external-store@npm:1.2.0, use-sync-external-store@npm:^1.2.0":
   version: 1.2.0
   resolution: "use-sync-external-store@npm:1.2.0"
   peerDependencies:
