@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 const DEFAULT_REDIRECT = '/login'
 
-export function useAuthenticatedRoute(claim?: string | ((claims: IUserClaims) => boolean)) {
+export function useAuthenticatedRoute(claim?: keyof IUserClaims | ((claims: IUserClaims) => boolean)) {
     const navigate = useNavigate()
     const location = useLocation()
     const authetication = useAuthenticationContext((context) => context.authetication)
@@ -25,7 +25,7 @@ function _checkClaims(
     claim: string | ((claims: IUserClaims) => boolean)
 ): boolean {
     if (typeof claim === 'string') {
-        if (authetication.claims[claim] !== undefined) return true
+        if (authetication.claims[claim as keyof IUserClaims] !== undefined) return true
     } else {
         if (claim(authetication.claims)) return true
     }

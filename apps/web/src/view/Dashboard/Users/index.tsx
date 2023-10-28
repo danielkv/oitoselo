@@ -1,6 +1,7 @@
 import RowActions from './components/RowActions'
 import { SearchOutlined } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
+import { useAuthenticatedRoute } from '@hooks/auth/useAuthenticatedRoute'
 import DashboardContainer from '@organism/DashboardContainer'
 import { getUnconfirmedUsersUseCase } from '@useCases/user/getUnconfirmedUsers'
 import { getUsersUseCase } from '@useCases/user/getUsers'
@@ -13,6 +14,8 @@ import useSWRInfinite from 'swr/infinite'
 const Users: React.FC = () => {
     const [endReached, setEndReached] = useState(false)
     const [search, setSearch] = useState('')
+
+    useAuthenticatedRoute('admin')
 
     const getKey = (pageIndex: number, previousPageData: IUser[]): [string, number, string | null, number] | null => {
         if (previousPageData && !previousPageData.length) return null
