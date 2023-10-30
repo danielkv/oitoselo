@@ -20,16 +20,18 @@ export const spreadsheetUpload = functions.https.onRequest(async (req, res) => {
     const form = new IncomingForm()
 
     //@ts-expect-error
-    form.parse(req, async (err, _, files) => {
+    form.parse(req, async (err, fields, files) => {
         if (err) return res.status(500).send('Erro ao mover arquivo para o armazenamento: ' + err.message)
+
+        if (!fields.date || !dayjs(fields.date).isValid()) throw new Error('Envie uma data válida')
 
         const file = files.file
 
         //@ts-expect-error
         const fileContent = (await readXlsxFile(file.path)) as []
-        fileContent.splice(0, 1) // ignore first row
+        //fileContent.splice(0, 1) // ignore first row
 
-        if (fileContent.some((row) => row[3] > 1)) throw new Error('A planilha deve ser apenas de 1 dia')
+        if (fileContent.some((row) => row[2] > 1)) throw new Error('A planilha deve ser apenas de 1 dia')
 
         const table = fileContent.map(parseRow)
 
@@ -46,6 +48,7 @@ export const spreadsheetUpload = functions.https.onRequest(async (req, res) => {
 
             const live = {
                 ...row,
+                date: dayjs(fields.date).format('YYYY-MM-DD'),
                 uid,
             }
 
@@ -87,17 +90,15 @@ async function findUserFromTable(table: Omit<Record<string, any>, 'uid'>[]) {
 }
 
 function parseRow(data: any[]): Omit<Record<string, any>, 'uid'> {
-    const [username, displayName] = data[0].split('\n\n')
-    const diamonds = Number(data[1].toString().replace('.', ''))
-    const duration = parseDuration(data[2])
-    const days = data[3]
+    const [username, displayName] = data[0]?.split('\n\n') || ['noname', 'noname']
+    const diamonds = Number(data[3].toString().replace('.', ''))
+    const duration = parseDuration(data[1])
 
     return {
         username,
         displayName,
         diamonds,
         duration,
-        days,
     }
 }
 

@@ -1,12 +1,16 @@
-import { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase-admin/firestore'
-import { ILiveTableRow, ILiveTableRowInput } from 'oitoselo-models'
+import { FirestoreDataConverter } from 'firebase/firestore'
+import { ILiveDayRow } from 'oitoselo-models'
 import { omit } from 'radash'
 
-export const liveConverter: FirestoreDataConverter<ILiveTableRow> = {
-    fromFirestore(snapshot: QueryDocumentSnapshot<ILiveTableRowInput>): ILiveTableRow {
-        return { id: snapshot.id, ...snapshot.data() }
+export const liveReportConverter: FirestoreDataConverter<ILiveDayRow, Omit<ILiveDayRow, 'id'>> = {
+    fromFirestore(snapshot): ILiveDayRow {
+        return {
+            id: snapshot.id,
+            ...(snapshot.data() as Omit<ILiveDayRow, 'id'>),
+        }
     },
     toFirestore(doc) {
-        return omit(doc, ['id'])
+        const res = omit(doc, ['id'])
+        return res as Omit<ILiveDayRow, 'id'>
     },
 }
