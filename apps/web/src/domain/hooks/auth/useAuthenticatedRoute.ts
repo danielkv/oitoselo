@@ -1,5 +1,6 @@
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
-import { IAutheticationContext, IUserClaims } from 'oitoselo-models'
+import { checkClaimsUseCase } from '@useCases/auth/validateClaims'
+import { IUserClaims } from 'oitoselo-models'
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -16,18 +17,6 @@ export function useAuthenticatedRoute(claim?: keyof IUserClaims | ((claims: IUse
 
         if (!claim) return
 
-        if (!_checkClaims(authetication, claim)) return navigate(redirectTo)
+        if (!checkClaimsUseCase(authetication, claim)) return navigate(redirectTo)
     }, [authetication, claim])
-}
-
-function _checkClaims(
-    authetication: IAutheticationContext,
-    claim: string | ((claims: IUserClaims) => boolean)
-): boolean {
-    if (typeof claim === 'string') {
-        if (authetication.claims[claim as keyof IUserClaims] !== undefined) return true
-    } else {
-        if (claim(authetication.claims)) return true
-    }
-    return false
 }

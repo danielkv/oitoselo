@@ -2,18 +2,19 @@ import { firebaseProvider } from '@common/providers/firebase'
 import { QueryCompositeFilterConstraint } from 'firebase/firestore'
 import { IDateRange, ILiveDayRow, ILiveReportRow } from 'oitoselo-models'
 import { liveReportConverter } from 'oitoselo-utils'
-import { alphabetical, group, sort } from 'radash'
+import { alphabetical, group } from 'radash'
 
 interface IGetReportsUseCase {
     dateRange: IDateRange
     uids?: string[]
 }
 export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILiveReportRow[]> {
+    console.log(filter)
     const db = firebaseProvider.firestore()
 
     const collectionRef = db.collection('lives').withConverter(liveReportConverter)
 
-    const query = db.query(collectionRef, _getCompositeFilter(filter), db.orderBy('displayName', 'asc'))
+    const query = db.query(collectionRef, _getCompositeFilter(filter))
 
     const reportSnapshot = await db.getDocs(query)
 

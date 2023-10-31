@@ -5,7 +5,7 @@ import { userConverter } from 'oitoselo-utils'
 
 interface IGetUsersUseCase {
     search?: string
-    limit: number
+    limit?: number
     lastUserId?: string | null
 }
 

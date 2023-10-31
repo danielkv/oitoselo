@@ -1,6 +1,7 @@
 import { init } from '../../helpers/init'
 import * as dayjs from 'dayjs'
 import * as duration from 'dayjs/plugin/duration'
+import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 import * as functions from 'firebase-functions'
 import { IncomingForm } from 'formidable-serverless'
@@ -12,10 +13,20 @@ init()
 dayjs.extend(duration)
 
 export const spreadsheetUpload = functions.https.onRequest(async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*')
+
     if (req.method !== 'POST') {
         res.status(405).send('Método não permitido')
         return
     }
+
+    const authToken = req.query.auth as string
+    if (!authToken) throw new Error('User not logged in')
+
+    const auth = getAuth()
+    const decoded = await auth.verifyIdToken(authToken)
+    const user = await auth.getUser(decoded.uid)
+    if (!user.customClaims?.admin) throw new Error("User doesn't have permission")
 
     const form = new IncomingForm()
 
@@ -58,7 +69,7 @@ export const spreadsheetUpload = functions.https.onRequest(async (req, res) => {
 
         await batch.commit()
 
-        res.send('lives added')
+        res.send('ok')
     })
 })
 
