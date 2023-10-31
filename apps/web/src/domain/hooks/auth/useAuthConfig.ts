@@ -4,12 +4,23 @@ import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContex
 import { getAuthenticationContextUseCase } from '@useCases/auth/getAuthenticationContext'
 import { Modal } from 'antd'
 import { User } from 'firebase/auth'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const setAuthetication = useAuthenticationContext.getState().setAuthetication
 const { error } = Modal
 
-export function useConfig() {
+export function useAuthConfig() {
+    const [loading, setLoading] = useState(true)
+
+    async function onAuthStateReady() {
+        await firebaseProvider.getAuth().authStateReady()
+
+        const user = firebaseProvider.getAuth().currentUser
+        await handleAuthStateChanged(user)
+
+        setLoading(false)
+    }
+
     async function handleAuthStateChanged(authUser: User | null) {
         try {
             if (!authUser || !authUser?.email) return setAuthetication(null)
@@ -23,8 +34,16 @@ export function useConfig() {
     }
 
     useEffect(() => {
+        onAuthStateReady()
+    }, [])
+
+    useEffect(() => {
+        if (loading) return
+
         const unsubscribe = firebaseProvider.getAuth().onAuthStateChanged(handleAuthStateChanged)
 
         return () => unsubscribe()
-    }, [])
+    }, [loading])
+
+    return { loading }
 }

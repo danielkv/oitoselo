@@ -13,6 +13,7 @@ import { Alert, Button, DatePicker, Form, Table, Typography } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 import { IDateRange, IUser } from 'oitoselo-models'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 
 const INITIAL_DATE_RANGE: IDateRange = {
@@ -53,14 +54,15 @@ const initialFormData: IReportFilterForm = {
 }
 
 const Reports: React.FC = () => {
+    const navigate = useNavigate()
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
-    const isUserAdmin = useValidatedClaim('admin')
+    const isAdminUser = useValidatedClaim('admin')
     const [filter, setFilter] = useState<IReportFilter>({
         dateRange: INITIAL_DATE_RANGE,
         users: [],
     })
 
-    useAuthenticatedRoute('admin')
+    useAuthenticatedRoute()
 
     const { data, isLoading, error } = useSWR(
         () => (loggedUser ? JSON.stringify(filter) : null),
@@ -77,6 +79,13 @@ const Reports: React.FC = () => {
         })
     }
 
+    if (!isAdminUser)
+        return (
+            <DashboardContainer>
+                <Alert showIcon type="warning" message="Você não permissão para acessar essa página" />
+            </DashboardContainer>
+        )
+
     const users = data?.flat() || []
 
     return (
@@ -88,7 +97,7 @@ const Reports: React.FC = () => {
                     className="flex gap-4 mb-5 w-auto"
                     initialValues={initialFormData}
                 >
-                    {isUserAdmin && (
+                    {isAdminUser && (
                         <Form.Item<IReportFilterForm> name="users">
                             <DebounceSelect
                                 placeholder="Usuários"
@@ -114,7 +123,7 @@ const Reports: React.FC = () => {
                     </Button>
                 </Form>
 
-                {isUserAdmin && <UploadReport />}
+                {isAdminUser && <UploadReport />}
             </div>
             {error ? (
                 <Alert type="error" message={getErrorMessage(error)} />
@@ -123,7 +132,16 @@ const Reports: React.FC = () => {
                     title={() => <Typography className="font-bold">Relatório</Typography>}
                     columns={[
                         { title: 'Nome', dataIndex: 'displayName' },
-                        { title: 'Username (TikTok)', width: 250, dataIndex: 'username' },
+                        {
+                            title: 'Username (TikTok)',
+                            width: 250,
+                            dataIndex: 'username',
+                            render: (username: string) => (
+                                <Button onClick={() => navigate(`/reports/${username}`)} type="link">
+                                    {username}
+                                </Button>
+                            ),
+                        },
                         {
                             title: 'Duração',
                             dataIndex: 'duration',

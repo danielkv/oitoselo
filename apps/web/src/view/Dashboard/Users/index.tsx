@@ -9,12 +9,14 @@ import { getUsersUseCase } from '@useCases/user/getUsers'
 import { Alert, Button, Collapse, Form, Input, Table, Typography } from 'antd'
 import { IUser } from 'oitoselo-models'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import useSWRInfinite from 'swr/infinite'
 
 const Users: React.FC = () => {
+    const navigate = useNavigate()
     const isAdminUser = useValidatedClaim('admin')
-    useAuthenticatedRoute('admin')
+    useAuthenticatedRoute()
 
     const [endReached, setEndReached] = useState(false)
     const [search, setSearch] = useState('')
@@ -47,7 +49,14 @@ const Users: React.FC = () => {
         data: unconfirmedUsers,
         isLoading: loadingUnconfirmed,
         mutate: mutateUnconfirmed,
-    } = useSWR('unconfirmedUsers', getUnconfirmedUsersUseCase)
+    } = useSWR(() => (isAdminUser ? 'unconfirmedUsers' : null), getUnconfirmedUsersUseCase)
+
+    if (!isAdminUser)
+        return (
+            <DashboardContainer>
+                <Alert showIcon type="warning" message="Você não permissão para acessar essa página" />
+            </DashboardContainer>
+        )
 
     const users = data?.flat() || []
 
@@ -67,7 +76,11 @@ const Users: React.FC = () => {
                             rowKey={(value) => value.id}
                             columns={[
                                 { title: 'Nome', dataIndex: 'displayName' },
-                                { title: 'Username (TikTok)', width: 250, dataIndex: 'username' },
+                                {
+                                    title: 'Username (TikTok)',
+                                    width: 250,
+                                    dataIndex: 'username',
+                                },
                                 { title: 'Email', dataIndex: 'email' },
                                 {
                                     title: 'Ações',
@@ -112,7 +125,16 @@ const Users: React.FC = () => {
                     title={() => <Typography className="font-bold">Usuários confirmados</Typography>}
                     columns={[
                         { title: 'Nome', dataIndex: 'displayName' },
-                        { title: 'Username (TikTok)', width: 250, dataIndex: 'username' },
+                        {
+                            title: 'Username (TikTok)',
+                            width: 250,
+                            dataIndex: 'username',
+                            render: (username: string) => (
+                                <Button onClick={() => navigate(`/reports/${username}`)} type="link">
+                                    {username}
+                                </Button>
+                            ),
+                        },
                         { title: 'Email', dataIndex: 'email' },
                         {
                             title: 'Ações',

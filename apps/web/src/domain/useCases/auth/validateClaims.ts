@@ -13,7 +13,7 @@ export function checkClaimsUseCase(
     claim: string | ((claims: IUserClaims) => boolean)
 ): boolean {
     if (typeof claim === 'string') {
-        if (authetication.claims[claim as keyof IUserClaims] !== undefined) return true
+        if (authetication.claims[claim as keyof IUserClaims] === true) return true
     } else {
         if (claim(authetication.claims)) return true
     }

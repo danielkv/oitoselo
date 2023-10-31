@@ -1,10 +1,21 @@
+import UserReport from '../UserReport'
+import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
 import { useAuthenticatedRoute } from '@hooks/auth/useAuthenticatedRoute'
-import DashboardContainer from '@organism/DashboardContainer'
+import { useValidatedClaim } from '@hooks/auth/useValidatedClaim'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Home: React.FC = () => {
     useAuthenticatedRoute()
+    const loggedUser = useAuthenticationContext((ctx) => ctx.authetication?.user)
+    const isAdminUser = useValidatedClaim('admin')
+    const navigate = useNavigate()
 
-    return <DashboardContainer>Home</DashboardContainer>
+    useEffect(() => {
+        if (loggedUser && isAdminUser) navigate('/users')
+    }, [isAdminUser, loggedUser])
+
+    return <UserReport />
 }
 
 export default Home

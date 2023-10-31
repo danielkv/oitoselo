@@ -1,3 +1,4 @@
+import { reduceDaysToReport } from '@common/helpers/reduceDaysToReport'
 import { firebaseProvider } from '@common/providers/firebase'
 import { QueryCompositeFilterConstraint } from 'firebase/firestore'
 import { IDateRange, ILiveDayRow, ILiveReportRow } from 'oitoselo-models'
@@ -9,7 +10,6 @@ interface IGetReportsUseCase {
     uids?: string[]
 }
 export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILiveReportRow[]> {
-    console.log(filter)
     const db = firebaseProvider.firestore()
 
     const collectionRef = db.collection('lives').withConverter(liveReportConverter)
@@ -25,18 +25,7 @@ export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILi
 
     const reportRows = Object.values(grouped)
         .filter((d) => d)
-        .map<ILiveReportRow>((days) =>
-            (days as ILiveDayRow[]).reduce<ILiveReportRow>((acc, day) => {
-                if (!day) return acc
-                return {
-                    uid: day.uid,
-                    displayName: day.displayName,
-                    username: day.username,
-                    diamonds: (acc.diamonds || 0) + day.diamonds,
-                    duration: (acc.duration || 0) + day.duration,
-                }
-            }, {} as ILiveReportRow)
-        )
+        .map<ILiveReportRow>((days) => reduceDaysToReport(days as ILiveDayRow[]))
 
     return alphabetical(reportRows, (row) => row.displayName)
 }

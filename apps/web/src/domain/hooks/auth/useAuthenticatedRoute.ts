@@ -1,12 +1,10 @@
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
-import { checkClaimsUseCase } from '@useCases/auth/validateClaims'
-import { IUserClaims } from 'oitoselo-models'
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const DEFAULT_REDIRECT = '/login'
 
-export function useAuthenticatedRoute(claim?: keyof IUserClaims | ((claims: IUserClaims) => boolean)) {
+export function useAuthenticatedRoute() {
     const navigate = useNavigate()
     const location = useLocation()
     const authetication = useAuthenticationContext((context) => context.authetication)
@@ -14,9 +12,5 @@ export function useAuthenticatedRoute(claim?: keyof IUserClaims | ((claims: IUse
 
     useEffect(() => {
         if (!authetication) return navigate(redirectTo)
-
-        if (!claim) return
-
-        if (!checkClaimsUseCase(authetication, claim)) return navigate(redirectTo)
-    }, [authetication, claim])
+    }, [authetication])
 }

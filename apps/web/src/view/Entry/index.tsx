@@ -1,5 +1,5 @@
 import { router } from '../../router'
-import { useConfig } from '@hooks/auth/useConfig'
+import AuthConfig from '@organism/AuthConfig'
 import { ConfigProvider } from 'antd'
 import locale from 'antd/locale/pt_BR'
 import dayjs from 'dayjs'
@@ -12,11 +12,11 @@ dayjs.locale(ptBR)
 dayjs.extend(duration)
 
 const Entry: React.FC = () => {
-    useConfig()
-
     return (
         <ConfigProvider locale={locale}>
-            <RouterProvider router={router} />
+            <AuthConfig>
+                <RouterProvider router={router} />
+            </AuthConfig>
         </ConfigProvider>
     )
 }

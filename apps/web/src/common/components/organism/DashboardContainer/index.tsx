@@ -2,12 +2,14 @@ import { LogoutOutlined } from '@ant-design/icons'
 import logoOitoSelo from '@assets/images/logo-oitoselo.png'
 import Container from '@common/components/atom/Container'
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
+import { useValidatedClaim } from '@hooks/auth/useValidatedClaim'
 import MenuItem from '@molecule/MenuItem'
 import { logUserOutUseCase } from '@useCases/auth/logUserOut'
 import { Button, Flex, Layout, Typography, theme } from 'antd'
 import { PropsWithChildren } from 'react'
 
 const DashboardContainer: React.FC<PropsWithChildren> = ({ children }) => {
+    const isAdminUser = useValidatedClaim('admin')
     const {
         token: { colorBgContainer, sizeMD, sizeSM },
     } = theme.useToken()
@@ -17,12 +19,16 @@ const DashboardContainer: React.FC<PropsWithChildren> = ({ children }) => {
     return (
         <Layout>
             <Layout.Header>
-                <Container>
-                    <Flex className="flex-row items-center justify-between ">
+                <Container className="h-full">
+                    <Flex className="flex-row items-center justify-between h-full">
                         <div className="flex items-center gap-3">
                             <img src={logoOitoSelo} title="Oitoselo" alt="Oitoselo" height={35} />
-                            <MenuItem label="Usuários" to="/users" />
-                            <MenuItem label="Relatórios" to="/reports" />
+                            {isAdminUser && (
+                                <>
+                                    <MenuItem label="Usuários" to="/users" />
+                                    <MenuItem label="Relatórios" to="/reports" />
+                                </>
+                            )}
                         </div>
                         {!!user && (
                             <div className="flex items-center">
