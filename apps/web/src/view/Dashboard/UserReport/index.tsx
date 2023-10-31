@@ -31,7 +31,7 @@ const initialFormData: IReportFilterForm = {
 }
 
 const UserReport: React.FC = () => {
-    useAuthenticatedRoute((claims) => claims.userConfirmed || claims.admin)
+    useAuthenticatedRoute()
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
     const isUserAdmin = useValidatedClaim('admin')
     const { username: usernameParam } = useParams()

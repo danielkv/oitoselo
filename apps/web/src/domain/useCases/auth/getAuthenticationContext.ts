@@ -1,6 +1,6 @@
 import { firebaseProvider } from '@common/providers/firebase'
 import { User } from 'firebase/auth'
-import { IAutheticationContext } from 'oitoselo-models'
+import { IAutheticationContext, IUserClaims } from 'oitoselo-models'
 import { userConverter } from 'oitoselo-utils'
 import { omit } from 'radash'
 
@@ -11,7 +11,7 @@ export async function getAuthenticationContextUseCase(user: User): Promise<IAuth
     if (!userSnapshot.exists()) throw new Error('Usuário não encontrado')
 
     const { claims } = await user.getIdTokenResult()
-    const customClaims = omit(claims, ['exp', 'sub', 'auth_time', 'iat', 'firebase'])
+    const customClaims = omit(claims, ['exp', 'sub', 'auth_time', 'iat', 'firebase']) as unknown as IUserClaims
 
     return { user: userSnapshot.data(), claims: customClaims }
 }
