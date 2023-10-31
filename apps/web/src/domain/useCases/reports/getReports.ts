@@ -20,7 +20,7 @@ export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILi
 
     const grouped = group(
         reportSnapshot.docs.map((r) => r.data()),
-        (r) => r.uid
+        (r) => r.username
     )
 
     const reportRows = Object.values(grouped)
