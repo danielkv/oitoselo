@@ -19,7 +19,7 @@ export const promoteUserToAdmin = https.onCall(async (uid: string, context) => {
         const userSnapshot = await docRef.get()
         const userData = userSnapshot.data()
 
-        if (!userSnapshot.exists || !userData) throw new Error('User does not exists')
+        if (!userSnapshot.exists || !userData) return
         userData.claims = { ...userData.claims, admin: true }
         await db.collection('users').doc(uid).update(userData)
     } catch (err: any) {
