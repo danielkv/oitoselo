@@ -3,6 +3,7 @@ import { SearchOutlined } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { useAuthenticatedRoute } from '@hooks/auth/useAuthenticatedRoute'
 import { useValidatedClaim } from '@hooks/auth/useValidatedClaim'
+import CursorPagination from '@molecule/CursorPagination'
 import DashboardContainer from '@organism/DashboardContainer'
 import { getUnconfirmedUsersUseCase } from '@useCases/user/getUnconfirmedUsers'
 import { getUsersUseCase } from '@useCases/user/getUsers'
@@ -12,6 +13,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import useSWRInfinite from 'swr/infinite'
+
+const DEFAULT_PAGE_SIZE = 10
 
 const Users: React.FC = () => {
     const navigate = useNavigate()
@@ -27,7 +30,7 @@ const Users: React.FC = () => {
 
         const previousLastItem = previousPageData?.[previousPageData.length - 1].id
 
-        return [search, 3, pageIndex === 0 ? null : previousLastItem, pageIndex]
+        return [search, DEFAULT_PAGE_SIZE, pageIndex === 0 ? null : previousLastItem, pageIndex]
     }
 
     const {
@@ -58,7 +61,7 @@ const Users: React.FC = () => {
             </DashboardContainer>
         )
 
-    const users = data?.flat() || []
+    const users = data ? data[data.length - 1] : []
 
     return (
         <DashboardContainer>
@@ -155,15 +158,15 @@ const Users: React.FC = () => {
                     loading={isLoading}
                     dataSource={users}
                     pagination={false}
-                    footer={
-                        !endReached
-                            ? () => (
-                                  <Button type="primary" loading={isValidating} onClick={() => setSize(size + 1)}>
-                                      Carregar mais
-                                  </Button>
-                              )
-                            : undefined
-                    }
+                    footer={() => (
+                        <CursorPagination
+                            loading={isValidating}
+                            setPage={setSize}
+                            currentPage={size}
+                            nextDisabled={endReached || users.length < DEFAULT_PAGE_SIZE}
+                            prevDisabled={size <= 1}
+                        />
+                    )}
                 />
             )}
         </DashboardContainer>
