@@ -1,4 +1,3 @@
-import UploadReport from './components/UploadReport'
 import { formatDiamonds } from '@common/helpers/formatDiamonds'
 import { formatDuration } from '@common/helpers/formatDuration'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
@@ -53,7 +52,7 @@ const initialFormData: IReportFilterForm = {
     users: [],
 }
 
-const Reports: React.FC = () => {
+const UnkownReports: React.FC = () => {
     const navigate = useNavigate()
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
     const isAdminUser = useValidatedClaim('admin')
@@ -122,16 +121,12 @@ const Reports: React.FC = () => {
                         Filtrar
                     </Button>
                 </Form>
-                <div className="flex gap-4">
-                    <Button onClick={() => navigate('/unkown-reports')}>Relatórios desconhecidos</Button>
-                    {isAdminUser && <UploadReport />}
-                </div>
             </div>
             {error ? (
                 <Alert type="error" message={getErrorMessage(error)} />
             ) : (
                 <Table
-                    title={() => <Typography className="font-bold">Relatório</Typography>}
+                    title={() => <Typography className="font-bold">Relatórios Desconhecidos</Typography>}
                     columns={[
                         { title: 'Nome', dataIndex: 'displayName' },
                         {
@@ -169,4 +164,4 @@ const Reports: React.FC = () => {
     )
 }
 
-export default Reports
+export default UnkownReports

@@ -7,6 +7,7 @@ import { liveReportConverter } from 'oitoselo-utils'
 interface IGetReportByUsernameUseCase {
     dateRange: IDateRange
     username: string
+    lastId?: string | null
 }
 
 export async function getReportByUsernameUseCase(filter: IGetReportByUsernameUseCase): Promise<ILiveReportRow> {

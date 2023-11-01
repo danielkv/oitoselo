@@ -5,12 +5,12 @@ import { IDateRange, ILiveDayRow, ILiveReportRow } from 'oitoselo-models'
 import { liveReportConverter } from 'oitoselo-utils'
 import { alphabetical, group } from 'radash'
 
-interface IGetReportsUseCase {
+interface IGetUnkownReportsUseCase {
     dateRange: IDateRange
     uids?: string[]
     lastUserId?: string | null
 }
-export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILiveReportRow[]> {
+export async function getUnkownReportsUseCase(filter: IGetUnkownReportsUseCase): Promise<ILiveReportRow[]> {
     const db = firebaseProvider.firestore()
 
     const collectionRef = db.collection('lives').withConverter(liveReportConverter)
@@ -31,19 +31,19 @@ export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILi
     return alphabetical(reportRows, (row) => row.displayName)
 }
 
-function _getCompositeFilter({ dateRange, uids }: IGetReportsUseCase): QueryCompositeFilterConstraint {
+function _getCompositeFilter({ dateRange, uids }: IGetUnkownReportsUseCase): QueryCompositeFilterConstraint {
     const db = firebaseProvider.firestore()
 
     if (uids?.length)
         return db.and(
-            db.where('uid', '!=', 'unknown'),
+            db.where('uid', '==', 'unknown'),
             db.where('date', '>=', dateRange.from),
             db.where('date', '<=', dateRange.to),
             db.where('uid', 'in', uids)
         )
 
     return db.and(
-        db.where('uid', '!=', 'unknown'),
+        db.where('uid', '==', 'unknown'),
         db.where('date', '>=', dateRange.from),
         db.where('date', '<=', dateRange.to)
     )
