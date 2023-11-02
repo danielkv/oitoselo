@@ -123,7 +123,7 @@ const Reports: React.FC = () => {
                     </Button>
                 </Form>
                 <div className="flex gap-4">
-                    <Button onClick={() => navigate('/unkown-reports')}>Relatórios desconhecidos</Button>
+                    <Button onClick={() => navigate('/unassigned-reports')}>Relatórios não atribuídos</Button>
                     {isAdminUser && <UploadReport />}
                 </div>
             </div>
@@ -133,7 +133,10 @@ const Reports: React.FC = () => {
                 <Table
                     title={() => <Typography className="font-bold">Relatório</Typography>}
                     columns={[
-                        { title: 'Nome', dataIndex: 'displayName' },
+                        {
+                            title: 'Nome',
+                            dataIndex: 'displayName',
+                        },
                         {
                             title: 'Username (TikTok)',
                             width: 250,

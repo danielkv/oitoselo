@@ -71,10 +71,10 @@ const BUTTONS: Record<TAction, IButton> = {
         onClick: demoteAdminUserUseCase,
     },
     delete: {
-        title: 'Deletar',
+        title: 'Excluir',
         icon: <DeleteOutlined />,
-        confirmationMessage: 'Tem certeza que deseja deletar esse usuário',
-        successMessage: 'Usuário deletado!',
+        confirmationMessage: 'Tem certeza que deseja excluir esse usuário',
+        successMessage: 'Usuário excluido!',
         onClick: deleteUserUseCase,
     },
 }
