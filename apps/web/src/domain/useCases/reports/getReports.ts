@@ -36,15 +36,12 @@ function _getCompositeFilter({ dateRange, uids }: IGetReportsUseCase): QueryComp
 
     if (uids?.length)
         return db.and(
-            db.where('uid', '!=', 'unknown'),
-            db.where('date', '>=', dateRange.from),
-            db.where('date', '<=', dateRange.to),
-            db.where('uid', 'in', uids)
+            db.where('uid', 'in', uids),
+            db.and(db.where('date', '>=', dateRange.from), db.where('date', '<=', dateRange.to))
         )
 
     return db.and(
         db.where('uid', '!=', 'unknown'),
-        db.where('date', '>=', dateRange.from),
-        db.where('date', '<=', dateRange.to)
+        db.and(db.where('date', '>=', dateRange.from), db.where('date', '<=', dateRange.to))
     )
 }
