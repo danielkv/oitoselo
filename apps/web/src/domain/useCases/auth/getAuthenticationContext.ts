@@ -1,17 +1,20 @@
-import { firebaseProvider } from '@common/providers/firebase'
-import { User } from 'firebase/auth'
-import { IAutheticationContext, IUserClaims } from 'oitoselo-models'
-import { userConverter } from 'oitoselo-utils'
-import { omit } from 'radash'
+import { User } from '@supabase/supabase-js'
+import { IAutheticationContext, IUserContext, IUserMetadata } from 'oitoselo-models'
+import { pick } from 'radash'
 
-export async function getAuthenticationContextUseCase(user: User): Promise<IAutheticationContext> {
-    const db = firebaseProvider.firestore()
-    const userSnapshot = await db.getDoc(db.doc('users', user.uid).withConverter(userConverter))
+export function getAuthenticationContextUseCase(user: User): IAutheticationContext {
+    if (!user.email) throw new Error('User email is not set')
 
-    if (!userSnapshot.exists()) throw new Error('Usuário não encontrado')
+    const customClaims = pick(user.app_metadata, ['userrole', 'claims_admin'])
 
-    const { claims } = await user.getIdTokenResult()
-    const customClaims = omit(claims, ['exp', 'sub', 'auth_time', 'iat', 'firebase']) as unknown as IUserClaims
+    const userData: IUserContext = {
+        ...(user.user_metadata as IUserMetadata),
+        id: user.id,
+        email: user.email || '',
+        claims: customClaims,
+    }
 
-    return { user: userSnapshot.data(), claims: customClaims }
+    return {
+        user: userData,
+    }
 }

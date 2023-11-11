@@ -27,7 +27,7 @@ const Login: React.FC = () => {
             await logUserInUseCase(values.email, values.password)
             navigate(redirectTo || '/')
         } catch (err) {
-            Modal.error({ title: 'Ocorreu um erro', content: getErrorMessage(err) })
+            Modal.error({ title: 'Ocorreu um erro ao logar', content: getErrorMessage(err) })
         } finally {
             setLoading(false)
         }

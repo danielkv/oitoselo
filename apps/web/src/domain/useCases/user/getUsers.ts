@@ -1,54 +1,58 @@
-import { firebaseProvider } from '@common/providers/firebase'
-import { QueryCompositeFilterConstraint } from 'firebase/firestore'
-import { IUser } from 'oitoselo-models'
-import { userConverter } from 'oitoselo-utils'
+import { profileViewToUser } from '@common/helpers/profileViewToUser'
+import { supabase } from '@common/providers/supabase'
+import { IPagination } from '@interfaces/pagination'
+import { Pagination } from '@supabase/supabase-js'
+import { IUserContext } from 'oitoselo-models'
 
 type TFilterUser = { uids?: string[]; search?: never } | { uids?: never; search: string }
-type IGetUsersUseCase = {
-    limit?: number
-    lastUserId?: string | null
-} & TFilterUser
+type IGetUsersUseCase = IPagination & TFilterUser
 
-export async function getUsersUseCase({ search, uids, limit = 10, lastUserId }: IGetUsersUseCase): Promise<IUser[]> {
-    const db = firebaseProvider.firestore()
-
-    const userCollection = db.collection('users').withConverter(userConverter)
-
-    const lastDocSnapshot = lastUserId ? await db.getDoc(db.doc('users', lastUserId)) : null
-    const query = db.query(
-        userCollection,
-        _getCompositeFilter({ search, uids } as TFilterUser),
-        db.orderBy('displayName', 'asc'),
-        db.startAfter(lastDocSnapshot),
-        db.limit(limit)
-    )
-
-    const usersSnapshot = await db.getDocs(query)
-
-    return usersSnapshot.docs.map((doc) => doc.data())
+interface IgetUsersUseCaseResponse extends Pagination {
+    users: IUserContext[]
 }
 
-function _getCompositeFilter(filter: TFilterUser): QueryCompositeFilterConstraint {
-    const db = firebaseProvider.firestore()
+export async function getUsersUseCase({
+    search,
+    uids,
+    limit = 10,
+    page,
+}: IGetUsersUseCase): Promise<IgetUsersUseCaseResponse> {
+    const defaultFilter = 'raw_app_meta_data->>userrole.neq.none, raw_app_meta_data->claims_admin.eq.true'
 
-    if (filter.search && filter.search.length >= 3)
-        return db.and(
-            db.or(db.where('claims.userConfirmed', '==', true), db.where('claims.admin', '==', true)),
-            db.or(
-                db.and(
-                    db.where('displayName', '>=', filter.search),
-                    db.where('displayName', '<=', filter.search + '\uf8ff')
-                ),
-                db.and(db.where('username', '>=', filter.search), db.where('username', '<=', filter.search + '\uf8ff')),
-                db.and(db.where('email', '>=', filter.search), db.where('email', '<=', filter.search + '\uf8ff'))
-            )
-        )
+    const query = supabase.from('profiles').select().or(defaultFilter)
+    const queryCount = supabase.from('profiles').select('*', { count: 'exact', head: true }).or(defaultFilter)
 
-    if (filter.uids?.length)
-        return db.and(
-            db.or(db.where('claims.userConfirmed', '==', true), db.where('claims.admin', '==', true)),
-            db.where('uid', 'in', filter.uids)
-        )
+    if (search) {
+        const sbStringQuery = `email.like.%${search}%, displayName.like.%${search}%`
+        query.or(sbStringQuery)
+        queryCount.or(sbStringQuery)
+    }
 
-    return db.or(db.where('claims.userConfirmed', '==', true), db.where('claims.admin', '==', true))
+    if (uids) {
+        query.in('id', uids)
+        queryCount.in('id', uids)
+    }
+
+    const from = page * limit
+    const to = from + limit
+
+    const { error: errorCount, count: total } = await queryCount
+    if (errorCount) throw errorCount
+    if (total === null) throw new Error('Ocorreu algum erro ao contar usuários')
+
+    const { data, error } = await query.range(from, to)
+    if (error) throw error
+    if (!data) throw new Error('Ocorreu algum erro ao requisitar os usuários')
+
+    const totalPages = Math.ceil(total / limit)
+    const nextPage = page + 1 > totalPages ? null : page + 1
+
+    const paginated: IgetUsersUseCaseResponse = {
+        users: data.map(profileViewToUser),
+        lastPage: totalPages,
+        nextPage,
+        total,
+    }
+
+    return paginated
 }

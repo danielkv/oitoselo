@@ -1,20 +1,17 @@
-import { firebaseProvider } from '@common/providers/firebase'
-import { IUser } from 'oitoselo-models'
-import { userConverter } from 'oitoselo-utils'
+import { profileViewToUser } from '@common/helpers/profileViewToUser'
+import { supabase } from '@common/providers/supabase'
+import { IUserContext } from 'oitoselo-models'
 
-export async function getUnconfirmedUsersUseCase(): Promise<IUser[]> {
-    const db = firebaseProvider.firestore()
+export async function getUnconfirmedUsersUseCase(): Promise<IUserContext[]> {
+    const query = supabase.from('profiles').select()
 
-    const userCollection = db.collection('users').withConverter(userConverter)
+    query
+        .or('raw_app_meta_data->>userrole.eq.default, raw_app_meta_data->userrole.is.null')
+        .order('displayName', { ascending: true })
 
-    const query = db.query(
-        userCollection,
-        db.where('claims.userConfirmed', '==', false),
-        db.where('claims.admin', '==', false),
-        db.orderBy('displayName', 'asc')
-    )
+    const { data, error } = await query
+    if (error) throw error
+    if (!data) throw new Error('Ocorreu algum erro ao requisitar os usuários')
 
-    const usersSnapshot = await db.getDocs(query)
-
-    return usersSnapshot.docs.map((doc) => doc.data())
+    return data.map(profileViewToUser)
 }

@@ -15,5 +15,8 @@
 		"apps/*",
 		"packages/*"
 	],
-	"packageManager": "yarn@3.6.4"
+	"packageManager": "yarn@3.6.4",
+	"devDependencies": {
+		"supabase": "^1.110.1"
+	}
 }

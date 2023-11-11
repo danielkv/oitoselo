@@ -1,11 +1,10 @@
-import { firebaseProvider } from '@common/providers/firebase'
+import { supabase } from '@common/providers/supabase'
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
 
 const setAuthentication = useAuthenticationContext.getState().setAuthetication
 
 export async function logUserOutUseCase(): Promise<void> {
-    const auth = firebaseProvider.getAuth()
     setAuthentication(null)
 
-    await auth.signOut()
+    await supabase.auth.signOut()
 }

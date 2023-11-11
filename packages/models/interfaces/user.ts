@@ -1,24 +1,32 @@
 export interface IUserClaims {
-    admin: boolean
-    userConfirmed: boolean
+    userrole?: 'default' | 'none'
+    claims_admin?: boolean
 }
 
-export interface IUserInput {
+export interface IUserMetadata {
     displayName: string
     disabled: boolean
-    email: string
-    username: string
-    password: string
+    username: string | null
     photoURL?: string
-    phoneNumber?: string
-    claims: IUserClaims
 }
 
-export interface IUser extends Omit<IUserInput, 'password'> {
+export interface IUserInput extends Omit<IUserMetadata, 'disabled'> {
+    email: string
+    password: string
+    phone?: string
+}
+
+export interface IUser extends IUserMetadata {
     id: string
+    email: string
+    phone?: string | null
+}
+
+export interface IUserContext extends IUser {
+    claims: IUserClaims
 }
 
 export interface IAutheticationContext {
-    user: IUser
-    claims: IUserClaims
+    user: IUserContext
+    //claims: IUserClaims
 }

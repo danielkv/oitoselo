@@ -1,7 +1,7 @@
-import { firebaseProvider } from '@common/providers/firebase'
-
-const promoteUserToAdminFn = firebaseProvider.FUNCTION_CALL<string>('promoteUserToAdmin')
+import { supabase } from '@common/providers/supabase'
 
 export async function promoteUserToAdminUseCase(uid: string) {
-    await promoteUserToAdminFn(uid)
+    const { error } = await supabase.rpc('set_claim', { uid, claim: 'claims_admin', value: 'true' })
+
+    if (error) throw error
 }

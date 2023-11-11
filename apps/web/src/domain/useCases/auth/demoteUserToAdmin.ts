@@ -1,7 +1,7 @@
-import { firebaseProvider } from '@common/providers/firebase'
-
-const demoteAdminUserFn = firebaseProvider.FUNCTION_CALL<string>('demoteAdminUser')
+import { supabase } from '@common/providers/supabase'
 
 export async function demoteAdminUserUseCase(uid: string) {
-    await demoteAdminUserFn(uid)
+    const { error } = await supabase.rpc('delete_claim', { uid, claim: 'claims_admin' })
+
+    if (error) throw error
 }

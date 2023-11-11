@@ -9,7 +9,7 @@ import { Button, Flex, Layout, Typography, theme } from 'antd'
 import { PropsWithChildren } from 'react'
 
 const DashboardContainer: React.FC<PropsWithChildren> = ({ children }) => {
-    const isAdminUser = useValidatedClaim('admin')
+    const isAdminUser = useValidatedClaim('claims_admin')
     const {
         token: { colorBgContainer, sizeMD, sizeSM },
     } = theme.useToken()

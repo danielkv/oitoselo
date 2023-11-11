@@ -3,50 +3,36 @@ import { SearchOutlined } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { useAuthenticatedRoute } from '@hooks/auth/useAuthenticatedRoute'
 import { useValidatedClaim } from '@hooks/auth/useValidatedClaim'
-import CursorPagination from '@molecule/CursorPagination'
 import DashboardContainer from '@organism/DashboardContainer'
 import { getUnconfirmedUsersUseCase } from '@useCases/user/getUnconfirmedUsers'
 import { getUsersUseCase } from '@useCases/user/getUsers'
 import { Alert, Button, Collapse, Form, Input, Table, Typography } from 'antd'
-import { IUser } from 'oitoselo-models'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
-import useSWRInfinite from 'swr/infinite'
 
 const DEFAULT_PAGE_SIZE = 10
 
 const Users: React.FC = () => {
     const navigate = useNavigate()
-    const isAdminUser = useValidatedClaim('admin')
+    const isAdminUser = useValidatedClaim('claims_admin')
     useAuthenticatedRoute()
 
-    const [endReached, setEndReached] = useState(false)
+    const [size, setSize] = useState(0)
     const [search, setSearch] = useState('')
 
-    const getKey = (pageIndex: number, previousPageData: IUser[]): [string, number, string | null, number] | null => {
+    const getKey = (): [string, number, number] | null => {
         if (!isAdminUser) return null
-        if (previousPageData && !previousPageData.length) return null
 
-        const previousLastItem = previousPageData?.[previousPageData.length - 1].id
-
-        return [search, DEFAULT_PAGE_SIZE, pageIndex === 0 ? null : previousLastItem, pageIndex]
+        return [search, DEFAULT_PAGE_SIZE, size]
     }
 
     const {
         data,
         isLoading,
-        isValidating,
         error,
-        size,
-        setSize,
         mutate: mutateConfirmed,
-    } = useSWRInfinite(getKey, (args) => getUsersUseCase({ search: args[0], limit: args[1], lastUserId: args[2] }), {
-        onSuccess(data) {
-            if (data && !data.at(-1)?.length) setEndReached(true)
-            else if (endReached) setEndReached(false)
-        },
-    })
+    } = useSWR(getKey, (args) => getUsersUseCase({ search: args[0], limit: args[1], page: args[2] }))
 
     const {
         data: unconfirmedUsers,
@@ -61,7 +47,7 @@ const Users: React.FC = () => {
             </DashboardContainer>
         )
 
-    const users = data ? data[data.length - 1] : []
+    const { users = [], total = 0 } = data || {}
 
     return (
         <DashboardContainer>
@@ -157,16 +143,13 @@ const Users: React.FC = () => {
                     rowKey={(value) => value.id}
                     loading={isLoading}
                     dataSource={users}
-                    pagination={false}
-                    footer={() => (
-                        <CursorPagination
-                            loading={isValidating}
-                            setPage={setSize}
-                            currentPage={size}
-                            nextDisabled={endReached || users.length < DEFAULT_PAGE_SIZE}
-                            prevDisabled={size <= 1}
-                        />
-                    )}
+                    pagination={{
+                        current: size + 1,
+                        total,
+                        onChange(page) {
+                            setSize(page)
+                        },
+                    }}
                 />
             )}
         </DashboardContainer>

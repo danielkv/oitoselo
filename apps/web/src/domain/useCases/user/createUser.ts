@@ -1,38 +1,21 @@
-import { firebaseProvider } from '@common/providers/firebase'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { IUser, IUserInput } from 'oitoselo-models'
-import { userConverter } from 'oitoselo-utils'
-import { omit, pick } from 'radash'
+import { supabase } from '@common/providers/supabase'
+import { IUserInput, IUserMetadata } from 'oitoselo-models'
+import { pick } from 'radash'
 
-const db = firebaseProvider.firestore()
-
-export async function createUserUseCase(data: Omit<IUserInput, 'claims'>): Promise<IUser> {
-    const userCredentials = await createUserWithEmailAndPassword(firebaseProvider.getAuth(), data.email, data.password)
-    const dataToSaveInAuth = pick(data, ['displayName', 'photoURL'])
-    await updateProfile(userCredentials.user, dataToSaveInAuth)
-
-    const dataToSaveInDb = omit(data, ['password'])
-    const docRef = db.doc('users', userCredentials.user.uid).withConverter(userConverter)
-    await db.setDoc(docRef, {
-        ...dataToSaveInDb,
+export async function createUserUseCase(userData: IUserInput): Promise<void> {
+    const userMetadata: IUserMetadata = {
+        ...pick(userData, ['displayName', 'photoURL', 'username']),
         disabled: false,
-        claims: {
-            admin: false,
-            userConfirmed: false,
-        },
-    } as IUser)
-
-    return {
-        id: userCredentials.user.uid,
-        displayName: data.displayName,
-        username: data.username,
-        email: data.email,
-        phoneNumber: userCredentials.user.phoneNumber || '',
-        photoURL: userCredentials.user.phoneNumber || '',
-        disabled: false,
-        claims: {
-            admin: false,
-            userConfirmed: false,
-        },
     }
+
+    const { data, error } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        phone: userData.phone,
+        options: {
+            data: userMetadata,
+        },
+    })
+    if (error) throw error
+    if (!data.user) throw new Error('User not created')
 }

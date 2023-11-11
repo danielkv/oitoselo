@@ -1,7 +1,5 @@
-import { firebaseProvider } from '@common/providers/firebase'
-
-const deleteUserFn = firebaseProvider.FUNCTION_CALL<string>('deleteUser')
+import { supabase } from '@common/providers/supabase'
 
 export async function deleteUserUseCase(uid: string) {
-    await deleteUserFn(uid)
+    await supabase.auth.admin.deleteUser(uid, true)
 }

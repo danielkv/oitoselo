@@ -8,19 +8,19 @@ import {
 } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
+import { confirmUserUseCase } from '@useCases/auth/confirmUser'
 import { demoteAdminUserUseCase } from '@useCases/auth/demoteUserToAdmin'
 import { promoteUserToAdminUseCase } from '@useCases/auth/promoteUserToAdmin'
-import { confirmUserUseCase } from '@useCases/user/confirmUser'
 import { deleteUserUseCase } from '@useCases/user/deleteUser'
 import { enableDisableUserUseCase } from '@useCases/user/enableDisableUser'
 import { Button, Flex, Modal, message } from 'antd'
-import { IUser } from 'oitoselo-models'
+import { IUser, IUserContext } from 'oitoselo-models'
 import { ReactNode, useCallback, useState } from 'react'
 
 type TAction = 'confirm' | 'promote' | 'demote' | 'delete' | 'disable' | 'enable'
 
 interface RowActionsProps {
-    user: IUser
+    user: IUserContext
     hideButtons?: TAction[]
     onSuccess?: (user: IUser) => void | Promise<void>
 }
@@ -124,8 +124,8 @@ const RowActions: React.FC<RowActionsProps> = ({ user, hideButtons, onSuccess })
                 if (hideButtons?.includes(key as TAction)) return
                 if (key === 'enable' && !user.disabled) return
                 if (key === 'disable' && user.disabled) return
-                if (key === 'promote' && user.claims.admin) return
-                if (key === 'demote' && !user.claims.admin) return
+                if (key === 'promote' && user.claims.claims_admin) return
+                if (key === 'demote' && !user.claims.claims_admin) return
 
                 return (
                     <Button

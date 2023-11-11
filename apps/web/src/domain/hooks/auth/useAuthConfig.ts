@@ -1,48 +1,56 @@
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
-import { firebaseProvider } from '@common/providers/firebase'
+import { supabase } from '@common/providers/supabase'
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
+import { User } from '@supabase/supabase-js'
 import { getAuthenticationContextUseCase } from '@useCases/auth/getAuthenticationContext'
 import { Modal } from 'antd'
-import { User } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 
 const setAuthetication = useAuthenticationContext.getState().setAuthetication
-const { error } = Modal
 
 export function useAuthConfig() {
     const [loading, setLoading] = useState(true)
 
     async function onAuthStateReady() {
-        await firebaseProvider.getAuth().authStateReady()
+        await supabase.auth.initialize()
 
-        const user = firebaseProvider.getAuth().currentUser
-        await handleAuthStateChanged(user)
+        const {
+            data: { session },
+            error,
+        } = await supabase.auth.getSession()
+        if (error) throw error
+
+        await handleAuthStateChanged(session?.user)
 
         setLoading(false)
     }
 
-    async function handleAuthStateChanged(authUser: User | null) {
+    async function handleAuthStateChanged(authUser?: User | null) {
         try {
-            if (!authUser || !authUser?.email) return setAuthetication(null)
+            if (!authUser?.email) return setAuthetication(null)
 
-            const authContext = await getAuthenticationContextUseCase(authUser)
+            const authContext = getAuthenticationContextUseCase(authUser)
 
             setAuthetication(authContext)
         } catch (err) {
-            error({ title: 'Ocorreu um erro', content: getErrorMessage(err) })
+            Modal.error({ title: 'Ocorreu um erro', content: getErrorMessage(err) })
         }
     }
 
     useEffect(() => {
-        onAuthStateReady()
+        onAuthStateReady().catch((err) => {
+            Modal.error({ title: 'Ocorreu um erro', content: getErrorMessage(err) })
+        })
     }, [])
 
     useEffect(() => {
         if (loading) return
 
-        const unsubscribe = firebaseProvider.getAuth().onAuthStateChanged(handleAuthStateChanged)
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_, session) => handleAuthStateChanged(session?.user))
 
-        return () => unsubscribe()
+        return () => subscription.unsubscribe()
     }, [loading])
 
     return { loading }
