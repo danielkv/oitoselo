@@ -12,4 +12,6 @@ select
   users.created_at,
   users.phone
 from
-  auth.users;
+  auth.users
+WHERE
+  users.deleted_at IS NULL;
