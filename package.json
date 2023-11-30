@@ -17,6 +17,6 @@
 	],
 	"packageManager": "yarn@3.6.4",
 	"devDependencies": {
-		"supabase": "^1.110.1"
+		"supabase": "^1.115.4"
 	}
 }

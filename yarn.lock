@@ -5314,7 +5314,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "oitoselo@workspace:."
   dependencies:
-    supabase: ^1.110.1
+    supabase: ^1.115.4
   languageName: unknown
   linkType: soft
 
@@ -6942,9 +6942,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supabase@npm:^1.110.1":
-  version: 1.111.1
-  resolution: "supabase@npm:1.111.1"
+"supabase@npm:^1.115.4":
+  version: 1.117.1
+  resolution: "supabase@npm:1.117.1"
   dependencies:
     bin-links: ^4.0.1
     https-proxy-agent: ^7.0.2
@@ -6952,7 +6952,7 @@ __metadata:
     tar: 6.2.0
   bin:
     supabase: bin/supabase
-  checksum: 954884ca2385141ceb4da1405d38fb3ec22ac44e8dd66d6b19ce31794738906bc3b1e7ed75dc6bb188a5234e9607d546e5a70b415491b1544a6d3bd22d8d3f7d
+  checksum: da0cd6e400b4be6d77a6a5b327aa752ccd273c353e3a31c8feba1ee72a4cdc69f2f45ce1dcc702277727fb8f8f3dda7c46d25a63005bdddf2c22e245fc2c3eee
   languageName: node
   linkType: hard
 
