@@ -9,8 +9,8 @@ import {
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContext'
 import { confirmUserUseCase } from '@useCases/auth/confirmUser'
-import { demoteAdminUserUseCase } from '@useCases/auth/demoteUserToAdmin'
-import { promoteUserToAdminUseCase } from '@useCases/auth/promoteUserToAdmin'
+import { demoteAdminUseCase } from '@useCases/auth/demoteAdmin'
+import { promoteAdminUseCase } from '@useCases/auth/promoteAdmin'
 import { deleteUserUseCase } from '@useCases/user/deleteUser'
 import { enableDisableUserUseCase } from '@useCases/user/enableDisableUser'
 import { Button, Flex, Modal, message } from 'antd'
@@ -61,14 +61,14 @@ const BUTTONS: Record<TAction, IButton> = {
         icon: <SafetyCertificateOutlined />,
         confirmationMessage: 'Tem certeza que deseja promover esse usuário',
         successMessage: 'Usuário promovido!',
-        onClick: promoteUserToAdminUseCase,
+        onClick: promoteAdminUseCase,
     },
     demote: {
         title: 'Rebaixar administrador',
         icon: <SafetyCertificateFilled />,
         confirmationMessage: 'Tem certeza que deseja rebaixar esse usuário',
         successMessage: 'Usuário rebaixado!',
-        onClick: demoteAdminUserUseCase,
+        onClick: demoteAdminUseCase,
     },
     delete: {
         title: 'Excluir',

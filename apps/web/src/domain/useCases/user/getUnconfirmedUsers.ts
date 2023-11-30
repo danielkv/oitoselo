@@ -6,7 +6,8 @@ export async function getUnconfirmedUsersUseCase(): Promise<IUserContext[]> {
     const query = supabase.from('profiles').select()
 
     query
-        .or('raw_app_meta_data->>userrole.eq.default, raw_app_meta_data->userrole.is.null')
+        .or('raw_app_meta_data->claims_admin.is.null, raw_app_meta_data->claims_admin.eq.false')
+        .or('raw_app_meta_data->>userrole.neq.default, raw_app_meta_data->userrole.is.null')
         .order('displayName', { ascending: true })
 
     const { data, error } = await query

@@ -1,7 +1,7 @@
-import { supabase } from '@common/providers/supabase'
+import { createFunction } from '@common/providers/supabase'
 
-export async function confirmUserUseCase(uid: string) {
-    const { error } = await supabase.rpc('delete_claim', { uid, claim: 'userrole', value: 'default' })
+const confirmUserFn = createFunction<{ userId: string }>('confirmUser')
 
-    if (error) throw error
+export function confirmUserUseCase(userId: string) {
+    return confirmUserFn({ userId })
 }

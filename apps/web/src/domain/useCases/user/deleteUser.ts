@@ -1,5 +1,9 @@
-import { supabase } from '@common/providers/supabase'
+import { createFunction } from '@common/providers/supabase'
 
-export async function deleteUserUseCase(uid: string) {
-    await supabase.auth.admin.deleteUser(uid, true)
+const deleteUserFn = createFunction<{ userId: string }>('deleteUser', {
+    method: 'POST',
+})
+
+export function deleteUserUseCase(userId: string) {
+    return deleteUserFn({ userId })
 }

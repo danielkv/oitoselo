@@ -1,3 +1,4 @@
+import { FunctionInvokeOptions } from '@supabase/functions-js'
 import { createClient } from '@supabase/supabase-js'
 import { Database } from 'oitoselo-models'
 
@@ -6,16 +7,20 @@ const publicToken = import.meta.env.VITE_APP_SUPABASE_APPKEY
 
 export const supabase = createClient<Database>(supabaseUrl, publicToken)
 
-export function createFunction<Body extends object = any, Response = any>(
-    name: string
-): (params?: Body, headers?: Record<string, any>) => Promise<Response | null> {
-    return async (params?: Body, headers?: Record<string, any>) => {
-        const { data, error } = await supabase.functions.invoke<Response>(name, {
-            headers,
+export function createFunction<Body extends object = any, Response = void>(
+    name: string,
+    defaultOptions?: Omit<FunctionInvokeOptions, 'body'>
+): (params?: Body, headers?: FunctionInvokeOptions) => Promise<Response> {
+    return async (params?: Body, options = defaultOptions) => {
+        const _options: FunctionInvokeOptions = {
             body: params,
-        })
+            ...options,
+        }
+
+        const { data, error } = await supabase.functions.invoke<Response>(name, _options)
+
         if (error) throw error
 
-        return data
+        return data as Response
     }
 }
