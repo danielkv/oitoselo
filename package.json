@@ -8,7 +8,6 @@
 		"node": "18"
 	},
 	"scripts": {
-		"fb:emulator": "firebase emulators:start",
 		"dev:web": "yarn workspace oitoselo-web dev"
 	},
 	"workspaces": [
