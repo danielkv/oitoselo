@@ -36,7 +36,7 @@ async function getUsers(search: string): Promise<ISelectVelue[]> {
     return users.map((user) => ({
         ...user,
         key: user.id,
-        label: user.displayName,
+        label: user.displayName || user.email,
         value: user.id,
     }))
 }

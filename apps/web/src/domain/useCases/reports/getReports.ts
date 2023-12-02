@@ -7,12 +7,11 @@ import { alphabetical, group } from 'radash'
 interface IGetReportsUseCase {
     dateRange: IDateRange
     uids?: string[]
-    lastUserId?: string | null
 }
 export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILiveReportRow[]> {
     const query = supabase
         .from('lives')
-        .select('*, profiles(id, displayName)')
+        .select('*, profiles(id, displayName, email, username)')
         .gte('date', dayjs(filter.dateRange.from).format('YYYY-MM-DD'))
         .lte('date', dayjs(filter.dateRange.to).format('YYYY-MM-DD'))
 
@@ -28,7 +27,8 @@ export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILi
         if (days)
             acc.push({
                 ...reduceDaysToReport(days),
-                displayName: days[0].profiles?.displayName || '',
+                username: days[0].profiles?.username || '',
+                displayName: days[0].profiles?.displayName || days[0].profiles?.email || '',
             })
 
         return acc
