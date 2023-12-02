@@ -34,6 +34,7 @@ const UserReport: React.FC = () => {
     useAuthenticatedRoute()
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
     const isUserAdmin = useValidatedClaim('claims_admin')
+    const isConfirmed = useValidatedClaim('userrole', 'default')
     const { username: usernameParam } = useParams()
 
     const username = (isUserAdmin && usernameParam ? usernameParam : loggedUser?.username) || ''
@@ -43,7 +44,7 @@ const UserReport: React.FC = () => {
     })
 
     const { data, isLoading, error } = useSWR(
-        () => (loggedUser && username ? [JSON.stringify(filter), username] : null),
+        () => (isConfirmed && loggedUser && username ? [JSON.stringify(filter), username] : null),
         () =>
             getReportByUsernameUseCase({
                 dateRange: filter.dateRange,
@@ -59,6 +60,13 @@ const UserReport: React.FC = () => {
             },
         })
     }
+
+    if (!isConfirmed)
+        return (
+            <DashboardContainer>
+                <Alert showIcon type="warning" message="Você não permissão para acessar essa página" />
+            </DashboardContainer>
+        )
 
     return (
         <DashboardContainer>

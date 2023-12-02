@@ -2,7 +2,7 @@ import { useAuthenticationContext } from '@contexts/auth/useAuthenticationContex
 import { IAutheticationContext, IUserClaims } from 'oitoselo-models'
 
 export function validateClaimsUseCase(
-    claim: string | ((claims: IUserClaims) => boolean),
+    claim: keyof IUserClaims | ((claims: IUserClaims) => boolean),
     value?: string | boolean
 ): boolean {
     const authContext = useAuthenticationContext.getState().authetication
@@ -13,13 +13,17 @@ export function validateClaimsUseCase(
 
 export function checkClaimsUseCase(
     authetication: IAutheticationContext,
-    claim: string | ((claims: IUserClaims) => boolean),
+    claim: keyof IUserClaims | ((claims: IUserClaims) => boolean),
     value?: string | boolean
 ): boolean {
     if (typeof claim === 'string') {
-        if (authetication.user.claims[claim as keyof IUserClaims] === value || true) return true
+        const claimValue = authetication.user.claims[claim]
+
+        if (value === undefined) return claimValue !== undefined
+        if (authetication.user.claims[claim] === value) return true
     } else {
         if (claim(authetication.user.claims)) return true
     }
+
     return false
 }
