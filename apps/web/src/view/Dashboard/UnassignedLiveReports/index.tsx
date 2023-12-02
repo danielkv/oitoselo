@@ -31,7 +31,7 @@ interface ISelectVelue extends IUser {
 }
 
 async function getUsers(search: string): Promise<ISelectVelue[]> {
-    const users = await getUsersUseCase({ search })
+    const { items: users } = await getUsersUseCase({ search, page: 0 })
 
     return users.map((user) => ({
         ...user,
@@ -61,18 +61,20 @@ const UnassignedLiveReports: React.FC = () => {
     const navigate = useNavigate()
     const [loadingAssign, setLoadingAssign] = useState(false)
     const [loadingDelete, setLoadingDelete] = useState(false)
-    const [selectedRows, setSelectedRows] = useState<string[]>([])
+    const [selectedRows, setSelectedRows] = useState<number[]>([])
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
-    const isAdminUser = useValidatedClaim('admin')
+    const isAdminUser = useValidatedClaim('claims_admin')
     const [filter, setFilter] = useState<IReportFilter>({
         dateRange: INITIAL_DATE_RANGE,
     })
+    const [page, setPage] = useState(0)
+    const [pageSize, setPageSize] = useState(10)
 
     useAuthenticatedRoute()
 
     const { data, isLoading, error, mutate } = useSWR(
-        () => (loggedUser ? JSON.stringify(filter) : null),
-        () => getUnassignedLiveReportsUseCase({ dateRange: filter.dateRange })
+        () => (loggedUser ? [JSON.stringify(filter), page, pageSize] : null),
+        () => getUnassignedLiveReportsUseCase({ dateRange: filter.dateRange, page, pageSize })
     )
 
     const handleSubmitForm = ({ dateRange }: IReportFilterForm) => {
@@ -89,7 +91,7 @@ const UnassignedLiveReports: React.FC = () => {
             setLoadingDelete(true)
             await deleteLiveDaysUseCase(selectedRows)
 
-            mutate((rows) => rows?.filter((row) => !selectedRows.includes(row.id)))
+            mutate()
 
             setSelectedRows([])
 
@@ -106,7 +108,7 @@ const UnassignedLiveReports: React.FC = () => {
             setLoadingAssign(true)
             await assignLiveDaysUseCase(selectedRows, values.users[0].value)
 
-            mutate((rows) => rows?.filter((row) => !selectedRows.includes(row.id)))
+            mutate()
 
             setSelectedRows([])
 
@@ -203,14 +205,24 @@ const UnassignedLiveReports: React.FC = () => {
                         type: 'checkbox',
                         selectedRowKeys: selectedRows,
                         onChange(keys) {
-                            setSelectedRows(keys as string[])
+                            setSelectedRows(keys as number[])
                         },
                     }}
+                    pagination={{
+                        onChange(page, pageSize) {
+                            setPage(page - 1)
+                            setPageSize(pageSize)
+                        },
+
+                        current: page + 1,
+                        total: data?.total,
+                        pageSize: pageSize,
+                        showTotal: (total) => `Total ${total} items`,
+                    }}
                     columns={[
-                        { title: 'Nome', dataIndex: 'displayName' },
                         {
                             title: 'Username (TikTok)',
-                            width: 250,
+
                             dataIndex: 'username',
                             render: (username: string) => (
                                 <Button onClick={() => navigate(`/reports/${username}`)} type="link">
@@ -222,27 +234,27 @@ const UnassignedLiveReports: React.FC = () => {
                             title: 'Data',
                             dataIndex: 'date',
                             render: (value: number) => dayjs(value).format('DD/MM/YYYY'),
-                            sorter: { compare: (a, b) => dayjs(a.date).diff(b.date, 'd'), multiple: 1 },
+                            //sorter: { compare: (a, b) => dayjs(a.date).diff(b.date, 'd'), multiple: 1 },
                         },
                         {
                             title: 'Duração',
                             dataIndex: 'duration',
                             render: (value: number) => formatDuration(value),
-                            sorter: { compare: (a, b) => a.duration - b.duration, multiple: 1 },
+                            ///sorter: { compare: (a, b) => a.duration - b.duration, multiple: 1 },
                         },
                         {
                             title: 'Diamantes',
                             dataIndex: 'diamonds',
                             render: (value: number) => formatDiamonds(value),
-                            sorter: { compare: (a, b) => a.diamonds - b.diamonds, multiple: 2 },
+                            //sorter: { compare: (a, b) => a.diamonds - b.diamonds, multiple: 2 },
                         },
                         {
                             title: '',
                             render: (_, record) => (
                                 <RowActions
                                     record={record}
-                                    onSuccess={(record) => {
-                                        mutate((rows) => rows?.filter((row) => row.id !== record.id))
+                                    onSuccess={() => {
+                                        mutate()
                                     }}
                                 />
                             ),
@@ -250,8 +262,7 @@ const UnassignedLiveReports: React.FC = () => {
                     ]}
                     rowKey={(value) => value.id}
                     loading={isLoading}
-                    dataSource={data}
-                    pagination={false}
+                    dataSource={data?.items || []}
                 />
             )}
         </DashboardContainer>

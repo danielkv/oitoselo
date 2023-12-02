@@ -33,7 +33,7 @@ const initialFormData: IReportFilterForm = {
 const UserReport: React.FC = () => {
     useAuthenticatedRoute()
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
-    const isUserAdmin = useValidatedClaim('admin')
+    const isUserAdmin = useValidatedClaim('claims_admin')
     const { username: usernameParam } = useParams()
 
     const username = (isUserAdmin && usernameParam ? usernameParam : loggedUser?.username) || ''

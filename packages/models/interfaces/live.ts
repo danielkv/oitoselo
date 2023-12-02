@@ -1,14 +1,9 @@
-export interface ILiveDayInput {
-    uid: string
-    date: string
-    username: string
+import { Tables } from './database.types'
+
+export interface ILiveDayRow extends Tables<'lives'> {}
+
+export interface ILiveDayInput extends Omit<ILiveDayRow, 'id' | 'created_at'> {}
+
+export interface ILiveReportRow extends Omit<ILiveDayInput, 'date'> {
     displayName: string
-    diamonds: number
-    duration: number
 }
-
-export interface ILiveDayRow extends ILiveDayInput {
-    id: string
-}
-
-export interface ILiveReportRow extends Omit<ILiveDayInput, 'date'> {}

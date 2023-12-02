@@ -1,62 +1,31 @@
+import { buildPaginatedResponse, getPagination } from '@common/helpers/pagination'
 import { profileViewToUser } from '@common/helpers/profileViewToUser'
+import { getSorting } from '@common/helpers/sorting'
 import { supabase } from '@common/providers/supabase'
-import { IPagination } from '@interfaces/pagination'
-import { Pagination } from '@supabase/supabase-js'
+import { IPaginatedResponse, IPagination } from '@interfaces/pagination'
+import { ISorting } from '@interfaces/sorting'
 import { IUserContext } from 'oitoselo-models'
 
 type TFilterUser = { uids?: string[]; search?: never } | { uids?: never; search: string }
-type IGetUsersUseCase = IPagination & TFilterUser
 
-interface IGetUsersUseCaseResponse extends Pagination {
-    users: IUserContext[]
-}
+type IGetUsersUseCase = IPagination & ISorting<IUserContext> & TFilterUser
 
-export async function getUsersUseCase({
-    search,
-    uids,
-    limit = 10,
-    page,
-}: IGetUsersUseCase): Promise<IGetUsersUseCaseResponse> {
-    const defaultFilter = 'raw_app_meta_data->>userrole.neq.none, raw_app_meta_data->claims_admin.eq.true'
-    console.log(await supabase.auth.getSession())
+export async function getUsersUseCase(filter: IGetUsersUseCase): Promise<IPaginatedResponse<IUserContext>> {
+    const { from, to } = getPagination(filter)
+    const { sortBy, order } = getSorting(filter, 'displayName')
 
-    const query = supabase.from('profiles').select().or(defaultFilter)
-    const queryCount = supabase.from('profiles').select('*', { count: 'exact', head: true }).or(defaultFilter)
+    const query = supabase
+        .from('profiles')
+        .select('*', { count: 'exact' })
+        .or('raw_app_meta_data->>userrole.neq.none, raw_app_meta_data->claims_admin.eq.true')
 
-    if (search) {
-        const sbStringQuery = `email.like.%${search}%, displayName.like.%${search}%`
-        query.or(sbStringQuery)
-        queryCount.or(sbStringQuery)
-    }
+    if (filter.search) query.or(`email.like.%${filter.search}%, displayName.like.%${filter.search}%`)
 
-    if (uids) {
-        query.in('id', uids)
-        queryCount.in('id', uids)
-    }
+    if (filter.uids) query.in('id', filter.uids)
 
-    query.order('displayName')
-    queryCount.order('displayName')
-
-    const from = page * limit
-    const to = from + limit
-
-    const { error: errorCount, count: total } = await queryCount
-    if (errorCount) throw errorCount
-    if (total === null) throw new Error('Ocorreu algum erro ao contar usuários')
-
-    const { data, error } = await query.range(from, to)
+    const { data, error, count } = await query.order(sortBy, { ascending: order === 'asc' }).range(from, to)
     if (error) throw error
-    if (!data) throw new Error('Ocorreu algum erro ao requisitar os usuários')
+    if (count === null) throw new Error('Ocorreu algum erro ao contar usuários')
 
-    const totalPages = Math.ceil(total / limit)
-    const nextPage = page + 1 > totalPages ? null : page + 1
-
-    const paginated: IGetUsersUseCaseResponse = {
-        users: data.map(profileViewToUser),
-        lastPage: totalPages,
-        nextPage,
-        total,
-    }
-
-    return paginated
+    return buildPaginatedResponse(data.map(profileViewToUser), count, filter)
 }

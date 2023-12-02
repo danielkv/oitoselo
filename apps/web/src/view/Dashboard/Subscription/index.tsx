@@ -56,7 +56,7 @@ const Subscription: React.FC = () => {
                             <Input prefix={<MailOutlined />} />
                         </Form.Item>
                         <Form.Item<ISubscriptionForm>
-                            name="phoneNumber"
+                            name="phone"
                             label="Telefone"
                             rules={[{ required: true, message: 'Email é obrigatório' }]}
                         >

@@ -32,7 +32,7 @@ const Users: React.FC = () => {
         isLoading,
         error,
         mutate: mutateConfirmed,
-    } = useSWR(getKey, (args) => getUsersUseCase({ search: args[0], limit: args[1], page: args[2] }))
+    } = useSWR(getKey, (args) => getUsersUseCase({ search: args[0], pageSize: args[1], page: args[2] }))
 
     const {
         data: unconfirmedUsers,
@@ -47,7 +47,7 @@ const Users: React.FC = () => {
             </DashboardContainer>
         )
 
-    const { users = [], total = 0 } = data || {}
+    const { items: users = [], total = 0 } = data || {}
 
     return (
         <DashboardContainer>
@@ -147,7 +147,7 @@ const Users: React.FC = () => {
                         current: size + 1,
                         total,
                         onChange(page) {
-                            setSize(page)
+                            setSize(page - 1)
                         },
                     }}
                 />

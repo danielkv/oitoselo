@@ -19,7 +19,7 @@ interface IButton {
     confirmationMessage: string
     successMessage: string
     disabled?: (record: ILiveDayRow) => boolean
-    onClick: (id: string) => Promise<void>
+    onClick: (id: number) => Promise<void>
 }
 
 const BUTTONS: Record<TAction, IButton> = {
@@ -28,7 +28,7 @@ const BUTTONS: Record<TAction, IButton> = {
         icon: <DeleteOutlined />,
         confirmationMessage: 'Tem certeza que deseja excluir esse dia',
         successMessage: 'Dia excluido!',
-        onClick: (id: string) => deleteLiveDaysUseCase([id]),
+        onClick: (id: number) => deleteLiveDaysUseCase([id]),
     },
 }
 

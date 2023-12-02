@@ -1,13 +1,5 @@
-import { firebaseProvider } from '@common/providers/firebase'
+import { supabase } from '@common/providers/supabase'
 
-export async function assignLiveDaysUseCase(liveIds: string[], userId: string) {
-    const db = firebaseProvider.firestore()
-    const batch = db.writeBatch(firebaseProvider.getFirestore())
-
-    liveIds.forEach((id) => {
-        const docRef = db.doc('lives', id)
-        batch.update(docRef, { uid: userId })
-    })
-
-    await batch.commit()
+export async function assignLiveDaysUseCase(liveIds: number[], userId: string) {
+    await supabase.from('lives').update({ userId }).in('id', liveIds)
 }

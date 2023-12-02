@@ -1,7 +1,7 @@
-import { IUser, IUserClaims, IUserContext, Views } from 'oitoselo-models'
+import { IUser, IUserClaims, IUserContext, Tables } from 'oitoselo-models'
 import { omit } from 'radash'
 
-export function profileViewToUser(profile: Views<'profiles'>): IUserContext {
+export function profileViewToUser(profile: Tables<'profiles'>): IUserContext {
     const data = omit(profile, ['raw_app_meta_data']) as IUser
 
     return {
@@ -10,7 +10,7 @@ export function profileViewToUser(profile: Views<'profiles'>): IUserContext {
     }
 }
 
-function extractClaims(data: Views<'profiles'>['raw_app_meta_data']): IUserClaims {
+function extractClaims(data: Tables<'profiles'>['raw_app_meta_data']): IUserClaims {
     if (!data || Array.isArray(data) || typeof data !== 'object')
         return {
             claims_admin: false,

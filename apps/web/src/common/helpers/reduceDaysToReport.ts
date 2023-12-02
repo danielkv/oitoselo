@@ -1,11 +1,11 @@
 import { ILiveDayRow, ILiveReportRow } from 'oitoselo-models'
 
-export function reduceDaysToReport(days: ILiveDayRow[]) {
+export function reduceDaysToReport(days: ILiveDayRow[]): ILiveReportRow {
     return days.reduce<ILiveReportRow>((acc, day) => {
         if (!day) return acc
         return {
-            uid: day.uid,
-            displayName: day.displayName,
+            userId: day.userId,
+            displayName: '',
             username: day.username,
             diamonds: (acc.diamonds || 0) + day.diamonds,
             duration: (acc.duration || 0) + day.duration,

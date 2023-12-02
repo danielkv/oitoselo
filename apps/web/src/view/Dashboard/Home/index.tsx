@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 const Home: React.FC = () => {
     useAuthenticatedRoute()
     const loggedUser = useAuthenticationContext((ctx) => ctx.authetication?.user)
-    const isAdminUser = useValidatedClaim('admin')
+    const isAdminUser = useValidatedClaim('claims_admin')
     const navigate = useNavigate()
 
     useEffect(() => {

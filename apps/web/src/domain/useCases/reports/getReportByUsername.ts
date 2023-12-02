@@ -1,37 +1,24 @@
 import { reduceDaysToReport } from '@common/helpers/reduceDaysToReport'
-import { firebaseProvider } from '@common/providers/firebase'
-import { QueryCompositeFilterConstraint } from 'firebase/firestore'
+import { supabase } from '@common/providers/supabase'
+import dayjs from 'dayjs'
 import { IDateRange, ILiveReportRow } from 'oitoselo-models'
-import { liveReportConverter } from 'oitoselo-utils'
 
 interface IGetReportByUsernameUseCase {
     dateRange: IDateRange
     username: string
-    lastId?: string | null
 }
 
 export async function getReportByUsernameUseCase(filter: IGetReportByUsernameUseCase): Promise<ILiveReportRow> {
-    const db = firebaseProvider.firestore()
+    const { data, error } = await supabase
+        .from('lives')
+        .select()
+        .gte('date', dayjs(filter.dateRange.from).format('YYYY-MM-DD'))
+        .lte('date', dayjs(filter.dateRange.to).format('YYYY-MM-DD'))
+        .eq('username', filter.username)
 
-    const collectionRef = db.collection('lives').withConverter(liveReportConverter)
+    if (error) throw error
 
-    const query = db.query(collectionRef, _getCompositeFilter(filter))
-
-    const reportSnapshot = await db.getDocs(query)
-
-    const days = reportSnapshot.docs.map((r) => r.data())
-
-    const report = reduceDaysToReport(days)
+    const report = reduceDaysToReport(data)
 
     return report
-}
-
-function _getCompositeFilter({ dateRange, username }: IGetReportByUsernameUseCase): QueryCompositeFilterConstraint {
-    const db = firebaseProvider.firestore()
-
-    return db.and(
-        db.where('date', '>=', dateRange.from),
-        db.where('date', '<=', dateRange.to),
-        db.where('username', '==', username)
-    )
 }

@@ -28,7 +28,7 @@ interface ISelectVelue extends IUser {
 }
 
 async function getUsers(search: string): Promise<ISelectVelue[]> {
-    const users = await getUsersUseCase({ search })
+    const { items: users } = await getUsersUseCase({ search })
 
     return users.map((user) => ({
         ...user,
@@ -56,7 +56,7 @@ const initialFormData: IReportFilterForm = {
 const Reports: React.FC = () => {
     const navigate = useNavigate()
     const loggedUser = useAuthenticationContext((context) => context.authetication?.user)
-    const isAdminUser = useValidatedClaim('admin')
+    const isAdminUser = useValidatedClaim('claims_admin')
     const [filter, setFilter] = useState<IReportFilter>({
         dateRange: INITIAL_DATE_RANGE,
         users: [],
@@ -162,7 +162,7 @@ const Reports: React.FC = () => {
                             defaultSortOrder: 'descend',
                         },
                     ]}
-                    rowKey={(value) => value.uid}
+                    rowKey={(value) => value.userId || ''}
                     loading={isLoading}
                     dataSource={users}
                     pagination={false}
