@@ -63,7 +63,7 @@ function _parseRow(data: any[]): Omit<ILiveDayInput, 'date'> {
 }
 
 function _parseDuration(durationRaw: string): number {
-    const pattern = /^(?:(?<hours>\d+)h)?(?:(?<minutes>\d+)min)?(?<seconds>\d+)s$/
+    const pattern = /^(?:(?<hours>\d+)h)?(?:\s*)?(?:(?<minutes>\d+)min)?(?:\s*)?(?<seconds>\d+)s$/
     const match = durationRaw.match(pattern)
 
     if (!match?.groups) throw new Error('No duration found')
