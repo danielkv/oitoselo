@@ -1,16 +1,13 @@
-import { LockOutlined, MailOutlined, PhoneOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons'
+import UserMainFormFields from './components/UserMainFormFields'
+import { ISubscriptionForm } from './types'
+import { LockOutlined } from '@ant-design/icons'
 import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { useAuthenticatedRedirect } from '@hooks/auth/useAuthenticatedRedirect'
 import { createUserUseCase } from '@useCases/user/createUser'
 import { Button, Card, Flex, Form, Input, Layout, Modal } from 'antd'
-import { IUserInput } from 'oitoselo-models'
 import { omit } from 'radash'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-interface ISubscriptionForm extends IUserInput {
-    repeatPassword: string
-}
 
 const Subscription: React.FC = () => {
     const navigate = useNavigate()
@@ -38,37 +35,7 @@ const Subscription: React.FC = () => {
             <Flex align="center" justify="center" flex={1}>
                 <Card title="Preencha os dados abaixo para se cadastrar" className="w-[500px] max-w-[90%]">
                     <Form disabled={loading} layout="vertical" name="login" onFinish={handleSubmit}>
-                        <Form.Item<ISubscriptionForm>
-                            name="displayName"
-                            label="Nome completo"
-                            rules={[{ required: true, message: 'Nome é obrigatório' }]}
-                        >
-                            <Input prefix={<UserOutlined />} />
-                        </Form.Item>
-                        <Form.Item<ISubscriptionForm>
-                            name="email"
-                            label="Email"
-                            rules={[
-                                { required: true, message: 'Email é obrigatório' },
-                                { type: 'email', message: 'Email inválido' },
-                            ]}
-                        >
-                            <Input prefix={<MailOutlined />} />
-                        </Form.Item>
-                        <Form.Item<ISubscriptionForm>
-                            name="phone"
-                            label="Telefone"
-                            rules={[{ required: true, message: 'Email é obrigatório' }]}
-                        >
-                            <Input type="phone" prefix={<PhoneOutlined />} />
-                        </Form.Item>
-                        <Form.Item<ISubscriptionForm>
-                            name="username"
-                            label="Username (tiktok)"
-                            rules={[{ required: true, message: 'Email é obrigatório' }]}
-                        >
-                            <Input type="phone" prefix={<UserAddOutlined />} />
-                        </Form.Item>
+                        <UserMainFormFields />
                         <Form.Item<ISubscriptionForm>
                             name="password"
                             label="Senha"

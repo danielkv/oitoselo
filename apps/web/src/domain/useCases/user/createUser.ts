@@ -11,7 +11,7 @@ export async function createUserUseCase(userData: IUserInput): Promise<void> {
     const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
-        phone: userData.phone,
+        phone: userData.phone || undefined,
         options: {
             data: userMetadata,
         },
