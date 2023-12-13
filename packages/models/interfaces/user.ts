@@ -13,7 +13,7 @@ export interface IUserMetadata {
 export interface IUserInput extends Omit<IUserMetadata, 'disabled'> {
     email: string
     password: string
-    phone?: string
+    phone?: string | null
 }
 
 export interface IUser extends IUserMetadata {
