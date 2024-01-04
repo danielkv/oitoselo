@@ -1,3 +1,4 @@
+import { getErrorMessage } from '@common/helpers/getErrorMessage'
 import { supabase } from '@common/providers/supabase'
 import { UploadFile } from 'antd'
 import { RcFile } from 'antd/lib/upload'
@@ -19,7 +20,13 @@ export async function sendReportUseCase({ file, date }: ISendReportUseCase) {
 
     if (fileContent.some((row) => (row[2] as number) > 1)) throw new Error('A planilha deve ser apenas de 1 dia')
 
-    const table = fileContent.map(_parseRow)
+    const table = fileContent.map((row, index) => {
+        try {
+            return _parseRow(row)
+        } catch (err) {
+            throw new Error(`ROW ${index}: ${getErrorMessage(err)}`)
+        }
+    })
 
     const usernameMap = await _findUserFromTable(table)
 
@@ -63,10 +70,10 @@ function _parseRow(data: any[]): Omit<ILiveDayInput, 'date'> {
 }
 
 function _parseDuration(durationRaw: string): number {
-    const pattern = /^(?:(?<hours>\d+)h)?(?:\s*)?(?:(?<minutes>\d+)min)?(?:\s*)?(?<seconds>\d+)s$/
+    const pattern = /^(?:(?<hours>\d+)(h|hours?))?(?:\s*)?(?:(?<minutes>\d+)m(?:in)?)?(?:\s*)?(?<seconds>\d+)(s|sec)$/
     const match = durationRaw.match(pattern)
 
-    if (!match?.groups) throw new Error('No duration found')
+    if (!match?.groups) throw new Error(`No duration found: ${durationRaw}`)
 
     const { hours, minutes, seconds } = match.groups
 
