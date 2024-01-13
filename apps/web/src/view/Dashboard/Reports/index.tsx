@@ -141,11 +141,15 @@ const Reports: React.FC = () => {
                             title: 'Username (TikTok)',
                             width: 250,
                             dataIndex: 'username',
-                            render: (username: string) => (
-                                <Button onClick={() => navigate(`/reports/${username}`)} type="link">
+                            render: (username, record) => (
+                                <Button onClick={() => navigate(`/reports/${record.userId}`)} type="link">
                                     {username}
                                 </Button>
                             ),
+                        },
+                        {
+                            title: 'Número de dias',
+                            dataIndex: 'numberOfDays',
                         },
                         {
                             title: 'Duração',

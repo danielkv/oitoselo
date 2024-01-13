@@ -15,7 +15,7 @@ const routes = createRoutesFromElements(
         <Route path="reports" element={<Reports />} />
         <Route path="account" element={<Account />} />
         <Route path="unassigned-reports" element={<UnassignedLiveReports />} />
-        <Route path="reports/:username" element={<UserReport />} />
+        <Route path="reports/:userId" element={<UserReport />} />
         <Route path="login" element={<Login />} />
         <Route path="subscription" element={<Subscription />} />
     </>

@@ -1,7 +1,7 @@
 import { ILiveDayRow, ILiveReportRow } from 'oitoselo-models'
 
-export function reduceDaysToReport(days: ILiveDayRow[]): ILiveReportRow {
-    return days.reduce<ILiveReportRow>((acc, day) => {
+export function reduceDaysToReport(days: ILiveDayRow[]): Omit<ILiveReportRow, 'numberOfDays'> {
+    return days.reduce<Omit<ILiveReportRow, 'numberOfDays'>>((acc, day) => {
         if (!day) return acc
         return {
             userId: day.userId,

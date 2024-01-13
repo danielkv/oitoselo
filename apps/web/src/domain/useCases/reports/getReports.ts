@@ -12,6 +12,7 @@ export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILi
     const query = supabase
         .from('lives')
         .select('*, profiles(id, displayName, email, username)')
+        .gt('duration', 0)
         .gte('date', dayjs(filter.dateRange.from).format('YYYY-MM-DD'))
         .lte('date', dayjs(filter.dateRange.to).format('YYYY-MM-DD'))
 
@@ -27,6 +28,7 @@ export async function getReportsUseCase(filter: IGetReportsUseCase): Promise<ILi
         if (days)
             acc.push({
                 ...reduceDaysToReport(days),
+                numberOfDays: days.length,
                 username: days[0].profiles?.username || '',
                 displayName: days[0].profiles?.displayName || days[0].profiles?.email || '',
             })
